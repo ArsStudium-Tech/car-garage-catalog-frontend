@@ -55,8 +55,37 @@ export async function getGarage(): Promise<Garage> {
   return fetchAPI('/public/garage-by-domain');
 }
 
-export async function listCars(): Promise<Car[]> {
-  return fetchAPI('/public/cars');
+export interface ListCarsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  brandId?: string;
+  year?: number;
+  orderBy?: "price_asc" | "price_desc" | "newest" | "oldest";
+}
+
+export interface PaginatedCarsResponse {
+  cars: Car[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export async function listCars(params?: ListCarsParams): Promise<PaginatedCarsResponse> {
+  const queryParams = new URLSearchParams();
+  
+  if (params?.page) queryParams.append('page', params.page.toString());
+  if (params?.limit) queryParams.append('limit', params.limit.toString());
+  if (params?.search) queryParams.append('search', params.search);
+  if (params?.brandId) queryParams.append('brandId', params.brandId);
+  if (params?.year) queryParams.append('year', params.year.toString());
+  if (params?.orderBy) queryParams.append('orderBy', params.orderBy);
+
+  const queryString = queryParams.toString();
+  const endpoint = `/public/cars${queryString ? `?${queryString}` : ''}`;
+  
+  return fetchAPI(endpoint);
 }
 
 export async function getCar(id: string): Promise<Car> {
