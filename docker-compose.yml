@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  car-garage-frontend:
+    build: .
+    container_name: car-garage-catalog-frontend
+    restart: always
+    networks:
+      - proxy
+    environment:
+      NODE_ENV: production
+      PORT: 3050
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      MODE: PROD
+    ports:
+      - "3050:3050"
+
+networks:
+  proxy:
+    external: true

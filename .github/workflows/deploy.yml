@@ -1,0 +1,43 @@
+name: Deploy Car Garage Frontend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Deploy to VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            set -e
+
+            if [ ! -d "/home/david/car-garage-catalog-frontend/.git" ]; then
+              rm -rf /home/david/car-garage-catalog-frontend
+              git clone https://github.com/ArsStudium-Tech/car-garage-catalog-frontend.git /home/david/car-garage-catalog-frontend
+            else
+              cd /home/david/car-garage-catalog-frontend
+              git fetch origin main
+              git reset --hard origin/main
+            fi
+
+            cd /home/david/car-garage-catalog-frontend
+
+            echo "NODE_ENV=production" > .env
+            echo "MODE=PROD" >> .env
+            echo "PORT=3050" >> .env
+            echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" >> .env
+
+            docker compose up -d --build
+          EOF
