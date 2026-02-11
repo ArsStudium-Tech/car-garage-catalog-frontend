@@ -3,11 +3,12 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
+# Copia arquivos de dependências (incluindo yarn.lock)
+COPY package*.json yarn.lock* ./
 RUN yarn install --frozen-lockfile
 
 COPY . .
-RUN npm run build
+RUN yarn build
 
 # Stage 2: Runtime
 FROM node:20-alpine AS runner
@@ -29,4 +30,4 @@ USER nextjs
 
 EXPOSE ${PORT}
 
-CMD ["npm", "start"]
+CMD ["yarn", "start"]
