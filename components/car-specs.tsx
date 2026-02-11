@@ -10,8 +10,12 @@ export function CarSpecs({ car }: CarSpecsProps) {
     { label: "Modelo", value: car.model },
     { label: "Ano", value: car.year.toString() },
     { label: "Quilometragem", value: formatMileage(car.mileage) },
-    { label: "Status", value: car.status === "AVAILABLE" ? "Disponível" : "Vendido" },
-  ]
+    car.fuel && { label: "Combustível", value: car.fuel },
+    car.color && { label: "Cor", value: car.color },
+    car.transmission && { label: "Câmbio", value: car.transmission },
+    car.licensePlate && { label: "Placa", value: car.licensePlate },
+    { label: "Financiável", value: car.financeable ? "Sim" : "Não" },
+  ].filter(Boolean) as Array<{ label: string; value: string }>
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-y-8 gap-x-12">

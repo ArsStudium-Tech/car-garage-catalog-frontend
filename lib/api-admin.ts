@@ -17,6 +17,12 @@ export interface AdminCar {
   description?: string | null;
   status: 'AVAILABLE' | 'SOLD';
   images: string[];
+  fuel?: string | null;
+  color?: string | null;
+  transmission?: string | null;
+  licensePlate?: string | null;
+  financeable?: boolean;
+  options?: Record<string, boolean> | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -29,6 +35,12 @@ export interface CreateCarData {
   mileage?: number;
   description?: string;
   images?: File[];
+  fuel?: string;
+  color?: string;
+  transmission?: string;
+  licensePlate?: string;
+  financeable?: boolean;
+  options?: Record<string, boolean>;
 }
 
 export interface UpdateCarData {
@@ -41,6 +53,12 @@ export interface UpdateCarData {
   status?: 'AVAILABLE' | 'SOLD';
   images?: File[];
   imagesToKeep?: string[]; // Lista de URLs de imagens existentes a manter
+  fuel?: string;
+  color?: string;
+  transmission?: string;
+  licensePlate?: string;
+  financeable?: boolean;
+  options?: Record<string, boolean>;
 }
 
 function getAuthToken(): string | null {
@@ -95,7 +113,28 @@ async function fetchAdminAPI(endpoint: string, options: RequestInit = {}) {
       throw new Error(error.error || `API error: ${response.status}`);
     }
 
-    return await response.json();
+    // Se a resposta for 204 (No Content) ou não tiver conteúdo, retorna void
+    if (response.status === 204 || response.headers.get('content-length') === '0') {
+      return;
+    }
+
+    // Verifica se há conteúdo antes de tentar fazer parse
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      return;
+    }
+
+    // Tenta fazer parse do JSON, mas retorna void se falhar (para respostas vazias)
+    const text = await response.text();
+    if (!text || text.trim() === '') {
+      return;
+    }
+
+    try {
+      return JSON.parse(text);
+    } catch {
+      return;
+    }
   } catch (error) {
     console.error('API fetch error:', error);
     throw error;
@@ -168,6 +207,12 @@ export async function createCarAdmin(data: CreateCarData): Promise<AdminCar> {
   formData.append('price', data.price.toString());
   if (data.mileage) formData.append('mileage', data.mileage.toString());
   if (data.description) formData.append('description', data.description);
+  if (data.fuel) formData.append('fuel', data.fuel);
+  if (data.color) formData.append('color', data.color);
+  if (data.transmission) formData.append('transmission', data.transmission);
+  if (data.licensePlate) formData.append('licensePlate', data.licensePlate);
+  if (data.financeable !== undefined) formData.append('financeable', data.financeable.toString());
+  if (data.options) formData.append('options', JSON.stringify(data.options));
   
   if (data.images) {
     data.images.forEach((image) => {
@@ -196,6 +241,12 @@ export async function updateCarAdmin(id: string, data: UpdateCarData): Promise<A
   if (data.mileage !== undefined) formData.append('mileage', data.mileage.toString());
   if (data.description !== undefined) formData.append('description', data.description || '');
   if (data.status) formData.append('status', data.status);
+  if (data.fuel !== undefined) formData.append('fuel', data.fuel || '');
+  if (data.color !== undefined) formData.append('color', data.color || '');
+  if (data.transmission !== undefined) formData.append('transmission', data.transmission || '');
+  if (data.licensePlate !== undefined) formData.append('licensePlate', data.licensePlate || '');
+  if (data.financeable !== undefined) formData.append('financeable', data.financeable.toString());
+  if (data.options !== undefined) formData.append('options', JSON.stringify(data.options));
   
   // Adiciona lista de imagens existentes a manter
   if (data.imagesToKeep) {
@@ -279,11 +330,12 @@ export async function updateSettings(data: UpdateSettingsData): Promise<GarageSe
 
 export function getLogoUrl(logoPath: string | null | undefined): string {
   if (!logoPath) return '/placeholder-logo.svg';
-  if (logoPath.startsWith('http')) return logoPath;
-  if (logoPath.startsWith('/uploads')) {
-    return `${API_URL}${logoPath}`;
+  if (logoPath.startsWith('http://') || logoPath.startsWith('https://')) {
+    return logoPath;
   }
-  return `${API_URL}${logoPath.startsWith('/') ? '' : '/'}${logoPath}`;
+  else{
+    return `https://${logoPath}`;
+  }
 }
 
 // Re-export format functions

@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google'
 import { ClientAuthProvider } from '@/components/auth-provider'
 import { PublicHeader } from '@/components/public-header'
 import { QueryProvider } from '@/components/query-provider'
+import { Toaster } from '@/components/ui/toaster'
 
 import './globals.css'
 
@@ -25,6 +26,7 @@ export default function RootLayout({
         <QueryProvider>
           <ClientAuthProvider>
             {children}
+            <Toaster />
           </ClientAuthProvider>
         </QueryProvider>
       </body>

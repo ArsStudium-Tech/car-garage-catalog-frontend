@@ -157,11 +157,57 @@ export default function VehicleDetailPage() {
                   <p className="text-xs uppercase font-bold text-muted-foreground tracking-wider mb-1">Quilometragem</p>
                   <p className="text-foreground font-medium">{formatMileage(car.mileage)}</p>
                 </div>
+                {car.fuel && (
+                  <div>
+                    <p className="text-xs uppercase font-bold text-muted-foreground tracking-wider mb-1">Combustível</p>
+                    <p className="text-foreground font-medium">{car.fuel}</p>
+                  </div>
+                )}
+                {car.color && (
+                  <div>
+                    <p className="text-xs uppercase font-bold text-muted-foreground tracking-wider mb-1">Cor</p>
+                    <p className="text-foreground font-medium">{car.color}</p>
+                  </div>
+                )}
+                {car.transmission && (
+                  <div>
+                    <p className="text-xs uppercase font-bold text-muted-foreground tracking-wider mb-1">Câmbio</p>
+                    <p className="text-foreground font-medium">{car.transmission}</p>
+                  </div>
+                )}
+                {car.licensePlate && (
+                  <div>
+                    <p className="text-xs uppercase font-bold text-muted-foreground tracking-wider mb-1">Placa</p>
+                    <p className="text-foreground font-medium">{car.licensePlate}</p>
+                  </div>
+                )}
+                <div>
+                  <p className="text-xs uppercase font-bold text-muted-foreground tracking-wider mb-1">Financiável</p>
+                  <p className="text-foreground font-medium">{car.financeable ? "Sim" : "Não"}</p>
+                </div>
                 <div>
                   <p className="text-xs uppercase font-bold text-muted-foreground tracking-wider mb-1">Status</p>
                   <p className="text-foreground font-medium">{car.status === "AVAILABLE" ? "Disponível" : "Vendido"}</p>
                 </div>
               </div>
+              
+              {/* Options */}
+              {car.options && Object.keys(car.options).length > 0 && (
+                <div className="mt-12 pt-8 border-t border-border">
+                  <h3 className="text-lg font-bold mb-4 text-foreground">Opcionais</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {Object.entries(car.options)
+                      .filter(([_, value]) => value === true)
+                      .map(([key, _]) => (
+                        <div key={key} className="flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 bg-primary rounded-full" />
+                          <span className="text-sm text-foreground">{key}</span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
               {car.description && (
                 <div className="mt-12 pt-8 border-t border-border">
                   <h3 className="text-lg font-bold mb-4 text-foreground">Descrição</h3>

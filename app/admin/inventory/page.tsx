@@ -7,15 +7,29 @@ import { Search, Plus, Eye, Pencil, Trash2, ChevronLeft, ChevronRight, TrendingU
 import { listCarsAdmin, deleteCarAdmin, formatPrice, formatMileage, getCarImageUrl, AdminCar } from "@/lib/api-admin"
 import Image from "next/image"
 import { Car as CarIcon } from "lucide-react"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { useToast } from "@/hooks/use-toast"
 
 export default function InventoryPage() {
   const router = useRouter()
+  const { toast } = useToast()
   const [cars, setCars] = useState<AdminCar[]>([])
   const [filteredCars, setFilteredCars] = useState<AdminCar[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedStatus, setSelectedStatus] = useState<string>("all")
   const [selectedBrand, setSelectedBrand] = useState<string>("all")
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [carToDelete, setCarToDelete] = useState<string | null>(null)
 
   useEffect(() => {
     loadCars()
@@ -25,26 +39,39 @@ export default function InventoryPage() {
     try {
       setLoading(true)
       const data = await listCarsAdmin()
-      setCars(data)
-      setFilteredCars(data)
+      // Garantir que sempre seja um array
+      const carsArray = Array.isArray(data) ? data : []
+      setCars(carsArray)
+      setFilteredCars(carsArray)
     } catch (error) {
       console.error("Error loading cars:", error)
+      setCars([])
+      setFilteredCars([])
+      toast({
+        title: "Erro ao carregar veículos",
+        description: "Não foi possível carregar a lista de veículos. Tente novamente.",
+        variant: "destructive",
+      })
     } finally {
       setLoading(false)
     }
   }
 
-  // Filter cars
   useEffect(() => {
+    if (!Array.isArray(cars)) {
+      setFilteredCars([])
+      return
+    }
+
     let filtered = [...cars]
 
     if (searchTerm) {
       const term = searchTerm.toLowerCase()
       filtered = filtered.filter(
         (car) =>
-          car.brand.name.toLowerCase().includes(term) ||
-          car.model.toLowerCase().includes(term) ||
-          car.year.toString().includes(term)
+          car.brand?.name?.toLowerCase().includes(term) ||
+          car.model?.toLowerCase().includes(term) ||
+          car.year?.toString().includes(term)
       )
     }
 
@@ -53,21 +80,36 @@ export default function InventoryPage() {
     }
 
     if (selectedBrand !== "all") {
-      filtered = filtered.filter((car) => car.brand.name === selectedBrand)
+      filtered = filtered.filter((car) => car.brand?.name === selectedBrand)
     }
 
     setFilteredCars(filtered)
   }, [searchTerm, selectedStatus, selectedBrand, cars])
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir este veículo?")) return
+  const handleDeleteClick = (id: string) => {
+    setCarToDelete(id)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!carToDelete) return
 
     try {
-      await deleteCarAdmin(id)
+      await deleteCarAdmin(carToDelete)
       await loadCars()
+      setDeleteDialogOpen(false)
+      setCarToDelete(null)
+      toast({
+        title: "Veículo excluído",
+        description: "O veículo foi excluído com sucesso.",
+      })
     } catch (error) {
       console.error("Error deleting car:", error)
-      alert("Erro ao excluir veículo")
+      toast({
+        title: "Erro ao excluir veículo",
+        description: "Não foi possível excluir o veículo. Tente novamente.",
+        variant: "destructive",
+      })
     }
   }
 
@@ -93,18 +135,18 @@ export default function InventoryPage() {
     }
   }
 
-  const brands = Array.from(new Set(cars.map((car) => car.brand.name))).sort()
+  const brands = Array.from(new Set((cars || []).map((car) => car.brand.name))).sort()
 
   // Calculate stats
-  const totalValue = cars.reduce((sum, car) => sum + car.price, 0)
-  const availableCount = cars.filter((car) => car.status === "AVAILABLE").length
-  const soldCount = cars.filter((car) => car.status === "SOLD").length
+  const totalValue = (cars || []).reduce((sum, car) => sum + car.price, 0)
+  const availableCount = (cars || []).filter((car) => car.status === "AVAILABLE").length
+  const soldCount = (cars || []).filter((car) => car.status === "SOLD").length
 
   const inventoryStats = [
     { 
       label: "Valor total do estoque", 
       value: formatPrice(totalValue), 
-      sub: `${cars.length} veículos`, 
+      sub: `${(cars || []).length} veículos`, 
       positive: true, 
       icon: DollarSign 
     },
@@ -117,7 +159,7 @@ export default function InventoryPage() {
     },
     { 
       label: "Total de veículos", 
-      value: `${cars.length} Veículos`, 
+      value: `${(cars || []).length} Veículos`, 
       sub: "Em estoque", 
       positive: true, 
       icon: Calendar 
@@ -219,7 +261,7 @@ export default function InventoryPage() {
                   </td>
                 </tr>
               ) : (
-                filteredCars.map((car) => {
+                (filteredCars || []).map((car) => {
                   const mainImage = car.images && car.images.length > 0 ? car.images[0] : null
                   const imageUrl = getCarImageUrl(mainImage)
                   
@@ -268,7 +310,7 @@ export default function InventoryPage() {
                             <Pencil className="h-4 w-4" />
                           </button>
                           <button 
-                            onClick={() => handleDelete(car.id)}
+                            onClick={() => handleDeleteClick(car.id)}
                             className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/5 rounded-lg transition-all" 
                             type="button"
                           >
@@ -288,7 +330,7 @@ export default function InventoryPage() {
         {filteredCars.length > 0 && (
           <div className="px-6 py-4 bg-muted/50 border-t border-border flex items-center justify-between">
             <span className="text-sm text-muted-foreground">
-              Mostrando {filteredCars.length} de {cars.length} veículos
+              Mostrando {filteredCars.length} de {(cars || []).length} veículos
             </span>
           </div>
         )}
@@ -310,6 +352,29 @@ export default function InventoryPage() {
           </div>
         ))}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir veículo</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir este veículo? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setCarToDelete(null)}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -17,6 +17,12 @@ export interface Car {
   description?: string | null;
   status: 'AVAILABLE' | 'SOLD';
   images: string[];
+  fuel?: string | null;
+  color?: string | null;
+  transmission?: string | null;
+  licensePlate?: string | null;
+  financeable?: boolean;
+  options?: Record<string, boolean> | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -115,18 +121,21 @@ export function formatMileage(mileage: number | null | undefined): string {
 
 export function getCarImageUrl(imagePath: string | null | undefined): string {
   if (!imagePath) return '/placeholder.svg';
-  if (imagePath.startsWith('http')) return imagePath;
-  // Se já começa com /uploads, adiciona a API_URL
-  if (imagePath.startsWith('/uploads')) {
-    return `${API_URL}${imagePath}`;
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
   }
-  // Caso contrário, adiciona /uploads se necessário
-  return `${API_URL}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+  else{
+    return `https://${imagePath}`;
+  }
 }
 
 export function getLogoUrl(logoPath: string | null | undefined): string {
   if (!logoPath) return '/placeholder-logo.svg';
-  if (logoPath.startsWith('http')) return logoPath;
+  // Se já for URL completa (R2 ou outro CDN), retorna direto
+  if (logoPath.startsWith('http://') || logoPath.startsWith('https://')) {
+    return logoPath;
+  }
+  // Compatibilidade com URLs antigas (/uploads/...)
   if (logoPath.startsWith('/uploads')) {
     return `${API_URL}${logoPath}`;
   }

@@ -156,6 +156,23 @@ export default function CarDetailPage() {
                 <h2 className="text-xl font-bold mb-6 text-foreground">Especificações</h2>
                 <CarSpecs car={car} />
 
+                {/* Options */}
+                {car.options && Object.keys(car.options).length > 0 && (
+                  <div className="mt-12 pt-8 border-t border-border">
+                    <h3 className="text-lg font-bold mb-4 text-foreground">Opcionais</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {Object.entries(car.options)
+                        .filter(([_, value]) => value === true)
+                        .map(([key, _]) => (
+                          <div key={key} className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-primary rounded-full" />
+                            <span className="text-sm text-foreground">{key}</span>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
                 {car.description && (
                   <div className="mt-12 pt-8 border-t border-border">
                     <h3 className="text-lg font-bold mb-4 text-foreground">Descrição</h3>
