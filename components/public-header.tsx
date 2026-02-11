@@ -28,13 +28,13 @@ export function PublicHeader() {
       <div className="container flex h-16 items-center justify-between px-4 md:px-8">
         <Link href="/" className="flex items-center gap-2">
           {garage?.logoUrl ? (
-            <div className="w-8 max-w-10 h-8 relative flex items-center justify-center">
+            <div className="w-14 h-14 relative flex items-center justify-center">
               <Image
                 src={getLogoUrl(garage.logoUrl)}
                 alt={garage.name || "Logo"}
                 fill
                 className="object-contain"
-                sizes="32px"
+                sizes="52px"
               />
             </div>
           ) : (

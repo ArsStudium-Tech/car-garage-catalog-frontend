@@ -8,14 +8,18 @@ import { getCar, getGarage, formatPrice, formatMileage, Car, Garage } from "@/li
 import { CarGallery } from "@/components/car-gallery"
 import { CarSpecs } from "@/components/car-specs"
 import { PublicHeader } from "@/components/public-header"
+import { useToast } from "@/hooks/use-toast"
 
 export default function CarDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const { toast } = useToast()
   const [car, setCar] = useState<Car | null>(null)
   const [garage, setGarage] = useState<Garage | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [queroFinanciar, setQueroFinanciar] = useState(false)
+  const [queroTroca, setQueroTroca] = useState(false)
 
   useEffect(() => {
     async function loadData() {
@@ -40,28 +44,94 @@ export default function CarDetailPage() {
   const handleWhatsApp = () => {
     if (!garage?.whatsapp || !car) return
 
-    const message = encodeURIComponent(
-      `Olá! Tenho interesse no veículo ${car.brand.name} ${car.model} ${car.year} (ID: ${car.id})`
-    )
-    const whatsappUrl = `https://wa.me/${garage.whatsapp.replace(/\D/g, "")}?text=${message}`
+    let message = `Olá! Tenho interesse no veículo ${car.brand.name} ${car.model} ${car.year}`
+    
+    const interesses = []
+    if (queroFinanciar) {
+      interesses.push("Quero financiar")
+    }
+    if (queroTroca) {
+      interesses.push("Quero dar veículo na troca")
+    }
+    
+    if (interesses.length > 0) {
+      message += `\n\nInteresses:\n${interesses.join("\n")}`
+    }
+
+    const encodedMessage = encodeURIComponent(message)
+    const nonDigitRegex = /\D/g
+    const whatsappNumber = garage.whatsapp.replace(nonDigitRegex, "")
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`
     window.open(whatsappUrl, "_blank")
   }
 
   const handleShare = async () => {
-    if (typeof window !== "undefined" && navigator.share) {
+    if (!car) return
+
+    const url = typeof window !== "undefined" ? window.location.href : ""
+    
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    
+    if (isMobile && typeof window !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: `${car?.brand.name} ${car?.model} ${car?.year}`,
-          text: `Confira este veículo: ${car?.brand.name} ${car?.model} ${car?.year}`,
-          url: window.location.href,
+          title: `${car.brand.name} ${car.model} ${car.year}`,
+          text: `Confira este veículo: ${car.brand.name} ${car.model} ${car.year}`,
+          url: url,
         })
-      } catch (err) {
-        // User cancelled or error
+        return
+      } catch (err: any) {
+        if (err.name === "AbortError") {
+          return
+        }
       }
-    } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard.writeText(window.location.href)
-      alert("Link copiado para a área de transferência!")
+    }
+
+    if (typeof window !== "undefined") {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(url)
+          toast({
+            title: "Link copiado!",
+            description: "O link foi copiado para a área de transferência.",
+          })
+          return
+        }
+      } catch (err) {
+      }
+
+      try {
+        const textArea = document.createElement("textarea")
+        textArea.value = url
+        textArea.style.position = "fixed"
+        textArea.style.left = "-999999px"
+        textArea.style.top = "0"
+        textArea.setAttribute("readonly", "")
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        const successful = document.execCommand("copy")
+        document.body.removeChild(textArea)
+        
+        if (successful) {
+          toast({
+            title: "Link copiado!",
+            description: "O link foi copiado para a área de transferência.",
+          })
+        } else {
+          toast({
+            title: "Erro ao copiar",
+            description: "Não foi possível copiar o link. Por favor, copie manualmente.",
+            variant: "destructive",
+          })
+        }
+      } catch (err) {
+        toast({
+          title: "Erro ao copiar",
+          description: "Não foi possível copiar o link. Por favor, copie manualmente.",
+          variant: "destructive",
+        })
+      }
     }
   }
 
@@ -199,19 +269,46 @@ export default function CarDetailPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-3">
-                  {garage?.whatsapp && (
-                    <button
-                      onClick={handleWhatsApp}
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2 text-sm"
-                      type="button"
-                    >
-                      <MessageCircle className="h-4 w-4" />
-                      Falar no WhatsApp
-                    </button>
-                  )}
+                {garage?.whatsapp && (
+                  <>
+                    <div className="border-t border-border my-4"></div>
+                    
+                    <div className="flex flex-col gap-3">
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={queroFinanciar}
+                          onChange={(e) => setQueroFinanciar(e.target.checked)}
+                          className="w-4 h-4 rounded border-border text-emerald-600 focus:ring-emerald-500 focus:ring-2"
+                        />
+                        <span className="text-sm text-foreground">Quero financiar</span>
+                      </label>
+                      
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={queroTroca}
+                          onChange={(e) => setQueroTroca(e.target.checked)}
+                          className="w-4 h-4 rounded border-border text-emerald-600 focus:ring-emerald-500 focus:ring-2"
+                        />
+                        <span className="text-sm text-foreground">Quero dar veículo na troca</span>
+                      </label>
+                    </div>
 
-                  {garage?.whatsapp ? (
+                    <div className="flex flex-col gap-3 mt-2">
+                      <button
+                        onClick={handleWhatsApp}
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2 text-sm"
+                        type="button"
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        Falar no WhatsApp
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                  {/* {garage?.whatsapp ? (
                     <button
                       onClick={handleWhatsApp}
                       className="w-full bg-card border border-border text-foreground font-bold py-2.5 rounded-lg hover:bg-muted transition-all flex items-center justify-center gap-2 text-sm"
@@ -228,8 +325,9 @@ export default function CarDetailPage() {
                       <Phone className="h-4 w-4" />
                       Solicitar Informações
                     </button>
-                  )}
+                  )} */}
 
+                <div className="flex flex-col gap-3 mt-3">
                   <button
                     onClick={handleShare}
                     className="w-full bg-card border border-border text-foreground font-bold py-2.5 rounded-lg hover:bg-muted transition-all flex items-center justify-center gap-2 text-sm"

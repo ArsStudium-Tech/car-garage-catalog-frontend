@@ -33,7 +33,7 @@ export default function EditVehiclePage() {
   const defaultValues = useMemo<Partial<CarFormData> | undefined>(() => {
     if (!car) return undefined
     return {
-      brandId: car.brandId,
+      brandId: String(car.brandId || ""),
       model: car.model,
       year: car.year,
       price: car.price,

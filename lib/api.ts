@@ -131,14 +131,11 @@ export function getCarImageUrl(imagePath: string | null | undefined): string {
 
 export function getLogoUrl(logoPath: string | null | undefined): string {
   if (!logoPath) return '/placeholder-logo.svg';
-  // Se já for URL completa (R2 ou outro CDN), retorna direto
   if (logoPath.startsWith('http://') || logoPath.startsWith('https://')) {
     return logoPath;
   }
-  // Compatibilidade com URLs antigas (/uploads/...)
-  if (logoPath.startsWith('/uploads')) {
-    return `${API_URL}${logoPath}`;
+  else{
+    return `https://${logoPath}`;
   }
-  return `${API_URL}${logoPath.startsWith('/') ? '' : '/'}${logoPath}`;
 }
 

@@ -50,7 +50,7 @@ export function useCarForm({ carId, defaultValues, onSuccess }: UseCarFormOption
     if (defaultValues && Object.keys(defaultValues).length > 0 && !hasInitialized.current) {
       hasInitialized.current = true
       form.reset({
-        brandId: defaultValues.brandId || "",
+        brandId: defaultValues.brandId ? String(defaultValues.brandId) : "",
         model: defaultValues.model || "",
         year: defaultValues.year || new Date().getFullYear(),
         price: defaultValues.price || 0,

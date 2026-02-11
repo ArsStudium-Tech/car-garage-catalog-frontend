@@ -50,7 +50,11 @@ export function BasicInfoSection({ brands, isEdit = false }: BasicInfoSectionPro
           render={({ field }) => (
             <FormItem>
               <FormLabel>Marca *</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value || ""} disabled={isSubmitting}>
+              <Select 
+                onValueChange={field.onChange} 
+                value={field.value ? String(field.value) : ""} 
+                disabled={isSubmitting}
+              >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione uma marca" />
@@ -58,7 +62,7 @@ export function BasicInfoSection({ brands, isEdit = false }: BasicInfoSectionPro
                 </FormControl>
                 <SelectContent>
                   {brands.map((brand) => (
-                    <SelectItem key={brand.id} value={brand.id}>
+                    <SelectItem key={brand.id} value={String(brand.id)}>
                       {brand.name}
                     </SelectItem>
                   ))}

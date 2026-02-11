@@ -65,7 +65,7 @@ export default function VehicleDetailPage() {
       <div className="p-8 max-w-7xl mx-auto">
         <div className="text-center py-16">
           <p className="text-lg font-semibold text-foreground mb-2">{error || "Veículo não encontrado"}</p>
-          <Link href="/inventory" className="text-primary hover:underline inline-flex items-center gap-2">
+          <Link href="/admin/inventory" className="text-primary hover:underline inline-flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
             Voltar ao inventário
           </Link>
@@ -81,18 +81,18 @@ export default function VehicleDetailPage() {
       {/* Breadcrumb */}
       <nav className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          <Link href="/inventory" className="text-muted-foreground hover:text-primary transition-colors">
+          <Link href="/admin/inventory" className="text-muted-foreground hover:text-primary transition-colors">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="flex items-center text-sm gap-2">
-            <Link href="/inventory" className="text-muted-foreground hover:text-primary transition-colors">
+            <Link href="/admin/inventory" className="text-muted-foreground hover:text-primary transition-colors">
               Inventory
             </Link>
             <ChevronRight className="h-3 w-3 text-muted-foreground" />
             <span className="font-semibold text-foreground">{carName}</span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <button
             onClick={() => router.push(`/admin/inventory/edit/${car.id}`)}
             className="flex items-center gap-1 text-muted-foreground hover:text-primary text-sm font-medium"
@@ -101,7 +101,7 @@ export default function VehicleDetailPage() {
             <Pencil className="h-4 w-4" />
             Edit Details
           </button>
-        </div>
+        </div> */}
       </nav>
 
       {/* Header */}

@@ -15,7 +15,7 @@ import {
 import { getSettings, getLogoUrl, GarageSettings } from "@/lib/api-admin"
 
 const navItems = [
-  { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+  /* { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard }, */
   { label: "Inventory", href: "/admin/inventory", icon: Car },
   /* { label: "Leads", href: "/admin/leads", icon: UserSearch },
   { label: "Sales", href: "/admin/reports", icon: ShoppingCart },
