@@ -42,13 +42,13 @@ export function BasicInfoSection({ brands, isEdit = false }: BasicInfoSectionPro
   return (
     <div className="bg-card p-6 rounded-xl shadow-sm border border-border">
       <h3 className="text-lg font-semibold mb-6 text-foreground">Informações Básicas</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Brand */}
         <FormField
           control={form.control}
           name="brandId"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-1">
               <FormLabel>Marca *</FormLabel>
               <Select 
                 onValueChange={field.onChange} 
@@ -78,7 +78,7 @@ export function BasicInfoSection({ brands, isEdit = false }: BasicInfoSectionPro
           control={form.control}
           name="model"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-1">
               <FormLabel>Modelo *</FormLabel>
               <FormControl>
                 <Input placeholder="Modelo" disabled={isSubmitting} {...field} />
@@ -93,7 +93,7 @@ export function BasicInfoSection({ brands, isEdit = false }: BasicInfoSectionPro
           control={form.control}
           name="year"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-1">
               <FormLabel>Ano *</FormLabel>
               <FormControl>
                 <Input
@@ -131,7 +131,7 @@ export function BasicInfoSection({ brands, isEdit = false }: BasicInfoSectionPro
             }
 
             return (
-              <FormItem>
+              <FormItem className="space-y-1">
                 <FormLabel>Preço (R$) *</FormLabel>
                 <FormControl>
                   <div className="relative">
@@ -163,7 +163,7 @@ export function BasicInfoSection({ brands, isEdit = false }: BasicInfoSectionPro
           control={form.control}
           name="mileage"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-1">
               <FormLabel>Quilometragem (km)</FormLabel>
               <FormControl>
                 <Input
@@ -187,7 +187,7 @@ export function BasicInfoSection({ brands, isEdit = false }: BasicInfoSectionPro
           control={form.control}
           name="fuel"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-1">
               <FormLabel>Combustível</FormLabel>
               <Select 
                 onValueChange={(value) => field.onChange(value === "none" ? null : value)} 
@@ -218,7 +218,7 @@ export function BasicInfoSection({ brands, isEdit = false }: BasicInfoSectionPro
           control={form.control}
           name="color"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-1">
               <FormLabel>Cor</FormLabel>
               <FormControl>
                 <Input placeholder="Cor do veículo" disabled={isSubmitting} {...field} value={field.value || ""} />
@@ -233,7 +233,7 @@ export function BasicInfoSection({ brands, isEdit = false }: BasicInfoSectionPro
           control={form.control}
           name="transmission"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-1">
               <FormLabel>Câmbio</FormLabel>
               <Select 
                 onValueChange={(value) => field.onChange(value === "none" ? null : value)} 
@@ -264,7 +264,7 @@ export function BasicInfoSection({ brands, isEdit = false }: BasicInfoSectionPro
           control={form.control}
           name="licensePlate"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-1">
               <FormLabel>Placa</FormLabel>
               <FormControl>
                 <Input placeholder="ABC-1234" disabled={isSubmitting} {...field} value={field.value || ""} />
@@ -302,7 +302,7 @@ export function BasicInfoSection({ brands, isEdit = false }: BasicInfoSectionPro
             control={form.control}
             name="status"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="space-y-1" >
                 <FormLabel>Status</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value || "AVAILABLE"} disabled={isSubmitting}>
                   <FormControl>

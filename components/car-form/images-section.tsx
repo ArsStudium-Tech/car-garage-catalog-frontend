@@ -1,7 +1,7 @@
 "use client"
 
 import { useFormContext } from "react-hook-form"
-import { useState } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Upload, Image as ImageIcon, Trash2 } from "lucide-react"
 import { getCarImageUrl } from "@/lib/api-admin"
 import { CarFormData } from "./car-form-schema"
@@ -21,28 +21,54 @@ export function ImagesSection({ isEdit = false }: ImagesSectionProps) {
   const imagesToKeep = form.watch("imagesToKeep") || []
   const isSubmitting = form.formState.isSubmitting
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
+  const [localOrder, setLocalOrder] = useState<ImageItem[] | null>(null)
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files)
       const currentImages = form.getValues("images") || []
       form.setValue("images", [...currentImages, ...files], { shouldValidate: true })
+      // Resetar ordem local quando nova imagem é adicionada
+      setLocalOrder(null)
     }
   }
 
   const displayExistingImages = isEdit ? existingImages.filter((url) => imagesToKeep.includes(url)) : existingImages
   
-  // Criar array combinado para gerenciar ordem
-  const combinedImages: ImageItem[] = [
-    ...displayExistingImages.map((url) => ({ type: "existing" as const, url })),
-    ...images.map((file, index) => ({ type: "new" as const, file, index }))
-  ]
+  // Criar array combinado para gerenciar ordem - usar estado local se disponível para resposta imediata
+  const combinedImages: ImageItem[] = useMemo(() => {
+    if (localOrder) {
+      return localOrder
+    }
+    return [
+      ...displayExistingImages.map((url) => ({ type: "existing" as const, url })),
+      ...images.map((file, index) => ({ type: "new" as const, file, index }))
+    ]
+  }, [localOrder, displayExistingImages, images])
+
+  // Sincronizar estado local quando os valores do formulário mudam (mas não por drag)
+  useEffect(() => {
+    if (!localOrder) return
+    
+    const currentCombined = [
+      ...displayExistingImages.map((url) => ({ type: "existing" as const, url })),
+      ...images.map((file, index) => ({ type: "new" as const, file, index }))
+    ]
+    
+    // Só resetar se a quantidade mudou (nova imagem adicionada/removida)
+    if (currentCombined.length !== localOrder.length) {
+      setLocalOrder(null)
+    }
+  }, [displayExistingImages.length, images.length, localOrder])
 
   const totalImages = combinedImages.length
 
   const removeImageByCombinedIndex = (combinedIndex: number) => {
     const item = combinedImages[combinedIndex]
     if (!item) return
+
+    // Resetar ordem local para sincronizar com remoção
+    setLocalOrder(null)
 
     if (item.type === "existing") {
       if (isEdit) {
@@ -89,6 +115,10 @@ export function ImagesSection({ isEdit = false }: ImagesSectionProps) {
     const [draggedItem] = newCombinedImages.splice(draggedIndex, 1)
     newCombinedImages.splice(dropIndex, 0, draggedItem)
 
+    // Atualizar estado local imediatamente para resposta visual instantânea
+    setLocalOrder(newCombinedImages)
+    setDraggedIndex(null)
+
     // Separar novamente em existing e new
     const newExistingImages: string[] = []
     const newImages: File[] = []
@@ -101,7 +131,7 @@ export function ImagesSection({ isEdit = false }: ImagesSectionProps) {
       }
     })
 
-    // Atualizar os arrays no form
+    // Atualizar os arrays no form (pode ser assíncrono, a UI já está atualizada)
     if (isEdit) {
       // Para edição, precisamos atualizar imagesToKeep também
       form.setValue("imagesToKeep", newExistingImages, { shouldValidate: true })
@@ -109,8 +139,6 @@ export function ImagesSection({ isEdit = false }: ImagesSectionProps) {
       form.setValue("existingImages", newExistingImages, { shouldValidate: true })
     }
     form.setValue("images", newImages, { shouldValidate: true })
-
-    setDraggedIndex(null)
   }
 
   const handleDragEnd = () => {

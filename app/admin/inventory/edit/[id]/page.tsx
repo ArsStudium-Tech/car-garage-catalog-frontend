@@ -92,11 +92,11 @@ export default function EditVehiclePage() {
           className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 text-sm font-medium"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Vehicle
+          Voltar para o inventário
         </Link>
       </div>
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground">Edit Vehicle</h2>
+        <h2 className="text-2xl font-bold text-foreground">Editar Veículo</h2>
         <p className="text-muted-foreground mt-1">Atualize os detalhes do veículo abaixo.</p>
       </div>
 
