@@ -132,7 +132,7 @@ export default function VehicleDetailPage() {
 
       <div className="grid grid-cols-12 gap-8">
         {/* Left Column */}
-        <div className="col-span-12 lg:col-span-8 flex flex-col gap-8">
+        <div className="col-span-12 lg:col-span-8 flex flex-col gap-5">
           {/* Gallery */}
           <CarGallery images={car.images} carName={carName} />
 

@@ -25,7 +25,7 @@ export function CarGallery({ images, carName }: CarGalleryProps) {
   if (!images || images.length === 0) {
     return (
       <div className="bg-card p-2 rounded-xl border border-border overflow-hidden shadow-sm">
-        <div className="aspect-video relative rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+        <div className="aspect-[4/3] relative rounded-lg overflow-hidden bg-muted flex items-center justify-center">
           <span className="text-2xl font-bold text-muted-foreground/30">Sem Imagens</span>
         </div>
       </div>
@@ -35,7 +35,7 @@ export function CarGallery({ images, carName }: CarGalleryProps) {
   return (
     <div className="bg-card p-2 rounded-xl border border-border overflow-hidden shadow-sm">
       {/* Main Image */}
-      <div className="aspect-video relative rounded-lg overflow-hidden bg-muted">
+      <div className="aspect-square relative rounded-lg overflow-hidden bg-muted">
         <Image
           src={getCarImageUrl(mainImage)}
           alt={`${carName} - Imagem ${currentIndex + 1}`}
@@ -50,19 +50,19 @@ export function CarGallery({ images, carName }: CarGalleryProps) {
           <>
             <button
               onClick={prevImage}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-foreground/60 text-card px-3 py-2 rounded-lg backdrop-blur-md hover:bg-foreground/80 transition-all"
+              className="absolute left-0 top-5 bottom-0 w-16 text-card hover:bg-foreground/30 transition-all flex items-center justify-center"
               type="button"
               aria-label="Imagem anterior"
             >
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-7 w-7 " />
             </button>
             <button
               onClick={nextImage}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-foreground/60 text-card px-3 py-2 rounded-lg backdrop-blur-md hover:bg-foreground/80 transition-all"
+              className="absolute right-0 top-5 bottom-0 w-16 text-card hover:bg-foreground/30 transition-all flex items-center justify-center"
               type="button"
               aria-label="Próxima imagem"
             >
-              <ChevronRight className="h-5 w-5" />
+              <ChevronRight className="h-7 w-7" />
             </button>
           </>
         )}

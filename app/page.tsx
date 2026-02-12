@@ -121,7 +121,7 @@ export default function CatalogPage() {
     <div className="min-h-screen bg-background">
       <PublicHeader />
       <div className="container mx-auto px-4 md:px-8 py-8">
-        <div className="mb-8">
+        <div className="mb-4 md:mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Catálogo de Veículos</h1>
           <p className="text-muted-foreground">
             {isLoading ? (

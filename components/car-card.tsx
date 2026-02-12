@@ -16,7 +16,7 @@ export function CarCard({ car }: CarCardProps) {
     <Link href={`/cars/${car.id}`} className="group">
       <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden hover:shadow-md transition-all">
         {/* Image */}
-        <div className="relative aspect-video bg-muted overflow-hidden">
+        <div className="relative aspect-[3/2] bg-muted overflow-hidden">
           {mainImage ? (
             <Image
               src={imageUrl}
