@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { listCars, formatPrice, listBrands, type Brand } from "@/lib/api"
+import { listCars, formatPrice, listBrandsWithCars, listYearsWithCars, type Brand } from "@/lib/api"
 import { CarCard } from "@/components/car-card"
 import { CarCardSkeleton } from "@/components/catalog/car-card-skeleton"
 import { ChevronLeft, ChevronRight } from "lucide-react"
@@ -25,8 +25,13 @@ export default function CatalogPage() {
   }, [debouncedSearchTerm])
 
   const { data: brandsData = [] } = useQuery<Brand[]>({
-    queryKey: ["brands"],
-    queryFn: () => listBrands(),
+    queryKey: ["brands-with-cars"],
+    queryFn: () => listBrandsWithCars(),
+  })
+
+  const { data: yearsData = [] } = useQuery<number[]>({
+    queryKey: ["years-with-cars"],
+    queryFn: () => listYearsWithCars(),
   })
 
   const queryParams = useMemo(() => {
@@ -89,13 +94,8 @@ export default function CatalogPage() {
   }
 
   const years = useMemo(() => {
-    const currentYear = new Date().getFullYear()
-    const yearsArray: string[] = []
-    for (let year = currentYear; year >= 2000; year--) {
-      yearsArray.push(year.toString())
-    }
-    return yearsArray
-  }, [])
+    return yearsData.map(year => year.toString())
+  }, [yearsData])
 
   const cars = carsData?.cars || []
   const totalPages = carsData?.totalPages || 0

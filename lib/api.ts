@@ -102,6 +102,14 @@ export async function listBrands(): Promise<Brand[]> {
   return fetchAPI('/public/brands');
 }
 
+export async function listBrandsWithCars(): Promise<Brand[]> {
+  return fetchAPI('/public/brands/with-cars');
+}
+
+export async function listYearsWithCars(): Promise<number[]> {
+  return fetchAPI('/public/years/with-cars');
+}
+
 export function formatPrice(price: number): string {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
