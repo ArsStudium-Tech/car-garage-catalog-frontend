@@ -45,7 +45,7 @@ export default function CatalogPage() {
   const queryParams = useMemo(() => {
     const params: any = {
       page,
-      limit: 8,
+      limit: 10,
       orderBy,
     }
 
