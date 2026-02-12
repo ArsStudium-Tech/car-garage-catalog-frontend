@@ -11,8 +11,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
-  title: 'AutoCore | Dealer Management Platform',
-  description: 'The complete operating system for modern automotive retailers. Manage inventory, track leads, and close deals faster.',
+  title: 'Catálogo de Veículos',
+  description: 'Catálogo de Veículos',
 }
 
 export default function RootLayout({
