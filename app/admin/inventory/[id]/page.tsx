@@ -86,7 +86,7 @@ export default function VehicleDetailPage() {
           </Link>
           <div className="flex items-center text-sm gap-2">
             <Link href="/admin/inventory" className="text-muted-foreground hover:text-primary transition-colors">
-              Inventory
+              Inventário
             </Link>
             <ChevronRight className="h-3 w-3 text-muted-foreground" />
             <span className="font-semibold text-foreground">{carName}</span>

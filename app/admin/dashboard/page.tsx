@@ -1,7 +1,7 @@
 import { Car, BarChart3, Tag, DollarSign, UserPlus, ShoppingBag, Pencil, Mail } from "lucide-react"
 
 const stats = [
-  { label: "Active Inventory", value: "142", change: "+4%", positive: true, icon: Car, iconBg: "bg-blue-50 text-[#1d73ed]" },
+  { label: "Inventário Ativo", value: "142", change: "+4%", positive: true, icon: Car, iconBg: "bg-blue-50 text-[#1d73ed]" },
   { label: "Leads This Month", value: "486", change: "+12%", positive: true, icon: BarChart3, iconBg: "bg-purple-50 text-purple-600" },
   { label: "Units Sold", value: "89", change: "-2%", positive: false, icon: Tag, iconBg: "bg-orange-50 text-orange-600" },
   { label: "Total Revenue", value: "$2.48M", change: "+8.2%", positive: true, icon: DollarSign, iconBg: "bg-emerald-50 text-emerald-600" },
@@ -135,7 +135,7 @@ export default function DashboardPage() {
         {/* Inventory Distribution */}
         <div className="xl:col-span-2 bg-card p-6 rounded-xl border border-border shadow-sm">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-foreground">Inventory Distribution</h2>
+            <h2 className="text-lg font-bold text-foreground">Distribuição de Inventário</h2>
             <span className="text-xs text-muted-foreground">Total: 142 Units</span>
           </div>
           <div className="flex items-end gap-2 h-48 pt-4">
@@ -157,7 +157,7 @@ export default function DashboardPage() {
         {/* Goal Progress */}
         <div className="bg-primary p-6 rounded-xl text-primary-foreground shadow-lg flex flex-col justify-between">
           <div>
-            <h2 className="text-lg font-bold">Goal Progress</h2>
+            <h2 className="text-lg font-bold">Progresso do Objetivo</h2>
             <p className="text-primary-foreground/70 text-sm mt-1">July Target: 120 Sales</p>
           </div>
           <div className="my-6">
@@ -170,7 +170,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <button className="w-full bg-primary-foreground/10 hover:bg-primary-foreground/20 border border-primary-foreground/30 py-2.5 rounded-lg text-sm font-semibold transition-all backdrop-blur-sm" type="button">
-            Analyze Team Productivity
+            Analisar a Produtividade da Equipe
           </button>
         </div>
       </div>

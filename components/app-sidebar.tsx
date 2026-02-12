@@ -17,7 +17,7 @@ import { useAuth } from "@/components/auth-provider"
 
 const navItems = [
   /* { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard }, */
-  { label: "Inventory", href: "/admin/inventory", icon: Car },
+  { label: "Inventário", href: "/admin/inventory", icon: Car },
   /* { label: "Leads", href: "/admin/leads", icon: UserSearch },
   { label: "Sales", href: "/admin/reports", icon: ShoppingCart },
   { label: "Reports", href: "/admin/reports", icon: BarChart3 }, */
@@ -93,7 +93,7 @@ export function AppSidebar() {
             }`}
           >
             <Settings className="h-5 w-5" />
-            <span>Settings</span>
+            <span>Configurações</span>
           </Link>
 
           <div className="mt-4 flex items-center gap-3 p-3 bg-muted rounded-xl">
