@@ -13,6 +13,7 @@ import {
   Settings,
 } from "lucide-react"
 import { getSettings, getLogoUrl, GarageSettings } from "@/lib/api-admin"
+import { useAuth } from "@/components/auth-provider"
 
 const navItems = [
   /* { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard }, */
@@ -25,6 +26,7 @@ const navItems = [
 export function AppSidebar() {
   const pathname = usePathname()
   const [settings, setSettings] = useState<GarageSettings | null>(null)
+  const { user, logout } = useAuth()
 
   useEffect(() => {
     getSettings()
@@ -55,7 +57,7 @@ export function AppSidebar() {
             </div>
           )}
           <span className="text-xl font-bold tracking-tight text-foreground">
-            {settings?.name || "Catálogo de Veículos"}
+            {settings?.name || "AutoCore"}
           </span>
         </div>
 
@@ -100,10 +102,10 @@ export function AppSidebar() {
             </div>
             <div className="overflow-hidden">
               <p className="text-sm font-semibold truncate text-foreground">
-                Alex Sterling
+                {user?.name || "User"}
               </p>
               <p className="text-xs text-muted-foreground truncate">
-                General Manager
+                {user?.email || "user@example.com"}
               </p>
             </div>
           </div>

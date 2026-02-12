@@ -314,6 +314,15 @@ export interface GarageSettings {
   secondaryColor?: string | null;
   whatsapp?: string | null;
   active: boolean;
+  endereco?: {
+    logradouro?: string | null;
+    bairro?: string | null;
+    numero?: string | null;
+    cidade?: string | null;
+    estado?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+  } | null;
 }
 
 export interface UpdateSettingsData {
@@ -324,6 +333,15 @@ export interface UpdateSettingsData {
   secondaryColor?: string;
   whatsapp?: string;
   active?: boolean;
+  endereco?: {
+    logradouro?: string;
+    bairro?: string;
+    numero?: string;
+    cidade?: string;
+    estado?: string;
+    latitude?: number;
+    longitude?: number;
+  };
 }
 
 export async function getSettings(): Promise<GarageSettings> {
@@ -338,6 +356,7 @@ export async function updateSettings(data: UpdateSettingsData): Promise<GarageSe
   if (data.secondaryColor !== undefined) formData.append('secondaryColor', data.secondaryColor);
   if (data.whatsapp !== undefined) formData.append('whatsapp', data.whatsapp || '');
   if (data.active !== undefined) formData.append('active', data.active.toString());
+  if (data.endereco !== undefined) formData.append('endereco', JSON.stringify(data.endereco));
   
   // Se houver novo logo para upload
   if (data.logo) {

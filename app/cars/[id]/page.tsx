@@ -9,6 +9,7 @@ import { CarGallery } from "@/components/car-gallery"
 import { CarSpecs } from "@/components/car-specs"
 import { PublicHeader } from "@/components/public-header"
 import { useToast } from "@/hooks/use-toast"
+import { PublicFooter } from "@/components/public-footer"
 
 export default function CarDetailPage() {
   const params = useParams()
@@ -359,6 +360,7 @@ export default function CarDetailPage() {
           </div>
         </div>
       </div>
+      <PublicFooter />
     </div>
   )
 }

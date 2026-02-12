@@ -7,6 +7,7 @@ import { CarCard } from "@/components/car-card"
 import { CarCardSkeleton } from "@/components/catalog/car-card-skeleton"
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 import { PublicHeader } from "@/components/public-header"
+import { PublicFooter } from "@/components/public-footer"
 import { Button } from "@/components/ui/button"
 import { useDebounce } from "@/hooks/use-debounce"
 import { CatalogFilters } from "@/components/catalog/catalog-filters"
@@ -118,9 +119,9 @@ export default function CatalogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <PublicHeader />
-      <div className="container mx-auto px-4 md:px-8 py-8">
+      <div className="container mx-auto px-4 md:px-8 py-8 flex-1">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Catálogo de Veículos</h1>
           <p className="text-muted-foreground">
@@ -214,6 +215,7 @@ export default function CatalogPage() {
           </>
         )}
       </div>
+      <PublicFooter />
     </div>
   )
 }
