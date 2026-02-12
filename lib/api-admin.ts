@@ -189,10 +189,38 @@ export async function listBrands(): Promise<Brand[]> {
   return fetchAdminAPI('/admin/brands');
 }
 
+export interface ListCarsAdminParams {
+  page?: number;
+  limit?: number;
+  status?: 'AVAILABLE' | 'SOLD';
+  brandId?: string;
+  search?: string;
+  orderBy?: "price_asc" | "price_desc" | "newest" | "oldest";
+}
+
+export interface PaginatedCarsAdminResponse {
+  cars: AdminCar[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 // Cars
-export async function listCarsAdmin(status?: 'AVAILABLE' | 'SOLD'): Promise<AdminCar[]> {
-  const query = status ? `?status=${status}` : '';
-  return fetchAdminAPI(`/admin/cars${query}`);
+export async function listCarsAdmin(params?: ListCarsAdminParams): Promise<PaginatedCarsAdminResponse> {
+  const queryParams = new URLSearchParams();
+  
+  if (params?.page) queryParams.append('page', params.page.toString());
+  if (params?.limit) queryParams.append('limit', params.limit.toString());
+  if (params?.status) queryParams.append('status', params.status);
+  if (params?.brandId) queryParams.append('brandId', params.brandId);
+  if (params?.search) queryParams.append('search', params.search);
+  if (params?.orderBy) queryParams.append('orderBy', params.orderBy);
+
+  const queryString = queryParams.toString();
+  const endpoint = `/admin/cars${queryString ? `?${queryString}` : ''}`;
+  
+  return fetchAdminAPI(endpoint);
 }
 
 export async function getCarAdmin(id: string): Promise<AdminCar> {

@@ -55,7 +55,7 @@ export function AppSidebar() {
             </div>
           )}
           <span className="text-xl font-bold tracking-tight text-foreground">
-            {settings?.name || "AutoCore"}
+            {settings?.name || "Catálogo de Veículos"}
           </span>
         </div>
 

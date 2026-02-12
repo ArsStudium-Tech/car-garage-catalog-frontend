@@ -46,15 +46,15 @@ export default function LoginPage() {
             <div className="flex items-center gap-2 mb-6">
               <Car className="h-9 w-9 text-primary" />
               <span className="text-2xl font-bold text-white tracking-tight">
-                AutoCore
+                Catálogo de Veículos
               </span>
             </div>
             <h1 className="text-4xl xl:text-5xl font-bold text-white mb-6 leading-tight text-balance">
-              Drive your business forward with intelligent inventory.
+              Impulsione seus negócios com um estoque inteligente.
             </h1>
+              {/* Gerencie seu estoque, acompanhe leads e feche negócios mais rápido. */}
             <p className="text-lg text-slate-200 mb-8 leading-relaxed">
-              The complete operating system for modern automotive retailers.
-              Manage inventory, track leads, and close deals faster.
+              O sistema completo para revendedores automotivos modernos.
             </p>
           </div>
         </div>
