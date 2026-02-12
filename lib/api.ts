@@ -77,6 +77,9 @@ export interface ListCarsParams {
   brandId?: string;
   year?: number;
   orderBy?: "price_asc" | "price_desc" | "newest" | "oldest";
+  financeable?: boolean;
+  minPrice?: number;
+  maxPrice?: number;
 }
 
 export interface PaginatedCarsResponse {
@@ -96,6 +99,9 @@ export async function listCars(params?: ListCarsParams): Promise<PaginatedCarsRe
   if (params?.brandId) queryParams.append('brandId', params.brandId);
   if (params?.year) queryParams.append('year', params.year.toString());
   if (params?.orderBy) queryParams.append('orderBy', params.orderBy);
+  if (params?.financeable !== undefined) queryParams.append('financeable', params.financeable.toString());
+  if (params?.minPrice !== undefined) queryParams.append('minPrice', params.minPrice.toString());
+  if (params?.maxPrice !== undefined) queryParams.append('maxPrice', params.maxPrice.toString());
 
   const queryString = queryParams.toString();
   const endpoint = `/public/cars${queryString ? `?${queryString}` : ''}`;

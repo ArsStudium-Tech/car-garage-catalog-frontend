@@ -19,13 +19,16 @@ export default function CatalogPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedBrand, setSelectedBrand] = useState<string>("all")
   const [selectedYear, setSelectedYear] = useState<string>("all")
+  const [selectedFinanceable, setSelectedFinanceable] = useState<string>("all")
+  const [minPrice, setMinPrice] = useState<string>("")
+  const [maxPrice, setMaxPrice] = useState<string>("")
   const [orderBy, setOrderBy] = useState<"price_asc" | "price_desc" | "newest" | "oldest">("newest")
 
   const debouncedSearchTerm = useDebounce(searchTerm)
 
   useEffect(() => {
     setPage(1)
-  }, [debouncedSearchTerm])
+  }, [debouncedSearchTerm, selectedBrand, selectedYear, selectedFinanceable, minPrice, maxPrice, orderBy])
 
   const { data: brandsData = [] } = useQuery<Brand[]>({
     queryKey: ["brands-with-cars"],
@@ -55,9 +58,24 @@ export default function CatalogPage() {
       const year = parseInt(selectedYear)
       if (!isNaN(year)) params.year = year
     }
+    if (selectedFinanceable !== "all") {
+      params.financeable = selectedFinanceable === "true"
+    }
+    if (minPrice) {
+      const minPriceNum = parseInt(minPrice)
+      if (!isNaN(minPriceNum) && minPriceNum >= 0) {
+        params.minPrice = minPriceNum
+      }
+    }
+    if (maxPrice) {
+      const maxPriceNum = parseInt(maxPrice)
+      if (!isNaN(maxPriceNum) && maxPriceNum >= 0) {
+        params.maxPrice = maxPriceNum
+      }
+    }
 
     return params
-  }, [page, debouncedSearchTerm, selectedBrand, selectedYear, orderBy, brandsData])
+  }, [page, debouncedSearchTerm, selectedBrand, selectedYear, selectedFinanceable, minPrice, maxPrice, orderBy, brandsData])
 
   const {
     data: carsData,
@@ -77,24 +95,29 @@ export default function CatalogPage() {
     setSearchTerm(value)
   }
 
-  const handleBrandChange = (value: string) => {
-    setSelectedBrand(value)
-    handleFilterChange()
-  }
-
-  const handleYearChange = (value: string) => {
-    setSelectedYear(value)
-    handleFilterChange()
-  }
-
-  const handleOrderByChange = (value: "price_asc" | "price_desc" | "newest" | "oldest") => {
-    setOrderBy(value)
+  const handleApplyFilters = (filters: {
+    brand: string
+    year: string
+    financeable: string
+    minPrice: string
+    maxPrice: string
+    orderBy: "price_asc" | "price_desc" | "newest" | "oldest"
+  }) => {
+    setSelectedBrand(filters.brand)
+    setSelectedYear(filters.year)
+    setSelectedFinanceable(filters.financeable)
+    setMinPrice(filters.minPrice)
+    setMaxPrice(filters.maxPrice)
+    setOrderBy(filters.orderBy)
     handleFilterChange()
   }
 
   const handleClearFilters = () => {
     setSelectedBrand("all")
     setSelectedYear("all")
+    setSelectedFinanceable("all")
+    setMinPrice("")
+    setMaxPrice("")
     setOrderBy("newest")
     handleFilterChange()
   }
@@ -141,13 +164,14 @@ export default function CatalogPage() {
           searchTerm={searchTerm}
           selectedBrand={selectedBrand}
           selectedYear={selectedYear}
+          selectedFinanceable={selectedFinanceable}
+          minPrice={minPrice}
+          maxPrice={maxPrice}
           orderBy={orderBy}
           brandsData={brandsData}
           years={years}
           onSearchChange={handleSearchChange}
-          onBrandChange={handleBrandChange}
-          onYearChange={handleYearChange}
-          onOrderByChange={handleOrderByChange}
+          onApplyFilters={handleApplyFilters}
           onClearFilters={handleClearFilters}
         />
 

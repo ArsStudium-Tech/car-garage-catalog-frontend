@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Search, Filter, X, ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/select"
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerFooter,
@@ -27,13 +26,21 @@ interface CatalogFiltersProps {
   searchTerm: string
   selectedBrand: string
   selectedYear: string
+  selectedFinanceable: string
+  minPrice: string
+  maxPrice: string
   orderBy: "price_asc" | "price_desc" | "newest" | "oldest"
   brandsData: Brand[]
   years: string[]
   onSearchChange: (value: string) => void
-  onBrandChange: (value: string) => void
-  onYearChange: (value: string) => void
-  onOrderByChange: (value: "price_asc" | "price_desc" | "newest" | "oldest") => void
+  onApplyFilters: (filters: {
+    brand: string
+    year: string
+    financeable: string
+    minPrice: string
+    maxPrice: string
+    orderBy: "price_asc" | "price_desc" | "newest" | "oldest"
+  }) => void
   onClearFilters: () => void
 }
 
@@ -41,24 +48,83 @@ export function CatalogFilters({
   searchTerm,
   selectedBrand,
   selectedYear,
+  selectedFinanceable,
+  minPrice,
+  maxPrice,
   orderBy,
   brandsData,
   years,
   onSearchChange,
-  onBrandChange,
-  onYearChange,
-  onOrderByChange,
+  onApplyFilters,
   onClearFilters,
 }: CatalogFiltersProps) {
   const [filtersOpen, setFiltersOpen] = useState(false)
+  
+  // Estados temporários para os filtros do drawer
+  const [tempBrand, setTempBrand] = useState(selectedBrand)
+  const [tempYear, setTempYear] = useState(selectedYear)
+  const [tempFinanceable, setTempFinanceable] = useState(selectedFinanceable)
+  const [tempMinPrice, setTempMinPrice] = useState(minPrice)
+  const [tempMaxPrice, setTempMaxPrice] = useState(maxPrice)
+  const [tempOrderBy, setTempOrderBy] = useState(orderBy)
+
+  // Sincroniza os estados temporários quando os valores reais mudam ou quando o drawer abre
+  useEffect(() => {
+    if (!filtersOpen) {
+      setTempBrand(selectedBrand)
+      setTempYear(selectedYear)
+      setTempFinanceable(selectedFinanceable)
+      setTempMinPrice(minPrice)
+      setTempMaxPrice(maxPrice)
+      setTempOrderBy(orderBy)
+    }
+  }, [selectedBrand, selectedYear, selectedFinanceable, minPrice, maxPrice, orderBy, filtersOpen])
+
+  // Sincroniza os estados temporários quando o drawer abre
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      setTempBrand(selectedBrand)
+      setTempYear(selectedYear)
+      setTempFinanceable(selectedFinanceable)
+      setTempMinPrice(minPrice)
+      setTempMaxPrice(maxPrice)
+      setTempOrderBy(orderBy)
+    }
+    setFiltersOpen(open)
+  }
+
+  const handleApplyFilters = () => {
+    onApplyFilters({
+      brand: tempBrand,
+      year: tempYear,
+      financeable: tempFinanceable,
+      minPrice: tempMinPrice,
+      maxPrice: tempMaxPrice,
+      orderBy: tempOrderBy,
+    })
+    setFiltersOpen(false)
+  }
 
   const hasActiveFilters = useMemo(() => {
-    return selectedBrand !== "all" || selectedYear !== "all" || orderBy !== "newest"
-  }, [selectedBrand, selectedYear, orderBy])
+    return selectedBrand !== "all" || selectedYear !== "all" || selectedFinanceable !== "all" || minPrice !== "" || maxPrice !== "" || orderBy !== "newest"
+  }, [selectedBrand, selectedYear, selectedFinanceable, minPrice, maxPrice, orderBy])
 
   const activeFiltersCount = useMemo(() => {
-    return [selectedBrand !== "all", selectedYear !== "all", orderBy !== "newest"].filter(Boolean).length
-  }, [selectedBrand, selectedYear, orderBy])
+    return [selectedBrand !== "all", selectedYear !== "all", selectedFinanceable !== "all", minPrice !== "" || maxPrice !== "", orderBy !== "newest"].filter(Boolean).length
+  }, [selectedBrand, selectedYear, selectedFinanceable, minPrice, maxPrice, orderBy])
+
+  const formatCurrencyDisplay = (value: string): string => {
+    if (!value) return ""
+    const numValue = parseInt(value)
+    if (isNaN(numValue)) return ""
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(numValue)
+  }
+
 
   const getOrderByLabel = (orderBy: "price_asc" | "price_desc" | "newest" | "oldest") => {
     switch (orderBy) {
@@ -115,7 +181,14 @@ export function CatalogFilters({
               <Badge variant="secondary" className="flex items-center gap-1">
                 Marca: {selectedBrand}
                 <button
-                  onClick={() => onBrandChange("all")}
+                  onClick={() => onApplyFilters({
+                    brand: "all",
+                    year: selectedYear,
+                    financeable: selectedFinanceable,
+                    minPrice,
+                    maxPrice,
+                    orderBy,
+                  })}
                   className="ml-1 hover:bg-muted rounded-full p-0.5"
                   aria-label="Remover filtro de marca"
                 >
@@ -127,9 +200,54 @@ export function CatalogFilters({
               <Badge variant="secondary" className="flex items-center gap-1">
                 Ano: {selectedYear}
                 <button
-                  onClick={() => onYearChange("all")}
+                  onClick={() => onApplyFilters({
+                    brand: selectedBrand,
+                    year: "all",
+                    financeable: selectedFinanceable,
+                    minPrice,
+                    maxPrice,
+                    orderBy,
+                  })}
                   className="ml-1 hover:bg-muted rounded-full p-0.5"
                   aria-label="Remover filtro de ano"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+            {selectedFinanceable !== "all" && (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                Financiável: {selectedFinanceable === "true" ? "Sim" : "Não"}
+                <button
+                  onClick={() => onApplyFilters({
+                    brand: selectedBrand,
+                    year: selectedYear,
+                    financeable: "all",
+                    minPrice,
+                    maxPrice,
+                    orderBy,
+                  })}
+                  className="ml-1 hover:bg-muted rounded-full p-0.5"
+                  aria-label="Remover filtro de financiável"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+            {(minPrice !== "" || maxPrice !== "") && (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                Preço: {minPrice ? formatCurrencyDisplay(minPrice) : "..."} - {maxPrice ? formatCurrencyDisplay(maxPrice) : "..."}
+                <button
+                  onClick={() => onApplyFilters({
+                    brand: selectedBrand,
+                    year: selectedYear,
+                    financeable: selectedFinanceable,
+                    minPrice: "",
+                    maxPrice: "",
+                    orderBy,
+                  })}
+                  className="ml-1 hover:bg-muted rounded-full p-0.5"
+                  aria-label="Remover filtro de preço"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -139,7 +257,14 @@ export function CatalogFilters({
               <Badge variant="secondary" className="flex items-center gap-1">
                 {getOrderByLabel(orderBy)}
                 <button
-                  onClick={() => onOrderByChange("newest")}
+                  onClick={() => onApplyFilters({
+                    brand: selectedBrand,
+                    year: selectedYear,
+                    financeable: selectedFinanceable,
+                    minPrice,
+                    maxPrice,
+                    orderBy: "newest",
+                  })}
                   className="ml-1 hover:bg-muted rounded-full p-0.5"
                   aria-label="Remover filtro de ordenação"
                 >
@@ -159,7 +284,7 @@ export function CatalogFilters({
         )}
       </div>
 
-      <Drawer open={filtersOpen} onOpenChange={setFiltersOpen}>
+      <Drawer open={filtersOpen} onOpenChange={handleOpenChange}>
         <DrawerContent className="max-h-[90vh] p-5">
           <DrawerHeader>
             <DrawerTitle>Filtros</DrawerTitle>
@@ -172,7 +297,7 @@ export function CatalogFilters({
             {/* Brand Filter */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">Marca</label>
-              <Select value={selectedBrand} onValueChange={onBrandChange}>
+              <Select value={tempBrand} onValueChange={setTempBrand}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione uma marca" />
                 </SelectTrigger>
@@ -189,7 +314,7 @@ export function CatalogFilters({
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">Ano</label>
-              <Select value={selectedYear} onValueChange={onYearChange}>
+              <Select value={tempYear} onValueChange={setTempYear}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione um ano" />
                 </SelectTrigger>
@@ -205,8 +330,54 @@ export function CatalogFilters({
             </div>
 
             <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Financiável</label>
+              <Select value={tempFinanceable} onValueChange={setTempFinanceable}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione uma opção" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="true">Sim</SelectItem>
+                  <SelectItem value="false">Não</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Faixa de Preço</label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">Preço Mínimo</label>
+                  <Input
+                    type="text"
+                    placeholder="R$ 0"
+                    value={tempMinPrice ? formatCurrencyDisplay(tempMinPrice) : ""}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "")
+                      setTempMinPrice(value)
+                    }}
+                    className="w-full"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">Preço Máximo</label>
+                  <Input
+                    type="text"
+                    placeholder="R$ 0"
+                    value={tempMaxPrice ? formatCurrencyDisplay(tempMaxPrice) : ""}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "")
+                      setTempMaxPrice(value)
+                    }}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">Ordenar por</label>
-              <Select value={orderBy} onValueChange={onOrderByChange}>
+              <Select value={tempOrderBy} onValueChange={(value) => setTempOrderBy(value as "price_asc" | "price_desc" | "newest" | "oldest")}>
                 <SelectTrigger>
                   <div className="flex items-center gap-2 w-full">
                     <ArrowUpDown className="h-4 w-4 shrink-0" />
@@ -227,15 +398,18 @@ export function CatalogFilters({
             {hasActiveFilters && (
               <Button
                 variant="outline"
-                onClick={onClearFilters}
+                onClick={() => {
+                  onClearFilters()
+                  setFiltersOpen(false)
+                }}
                 className="w-full"
               >
                 Limpar Filtros
               </Button>
             )}
-            <DrawerClose asChild>
-              <Button className="w-full">Aplicar Filtros</Button>
-            </DrawerClose>
+            <Button className="w-full" onClick={handleApplyFilters}>
+              Aplicar Filtros
+            </Button>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
