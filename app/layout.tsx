@@ -5,6 +5,7 @@ import { ClientAuthProvider } from '@/components/auth-provider'
 import { GarageProvider } from '@/components/garage-provider'
 import { QueryProvider } from '@/components/query-provider'
 import { Toaster } from '@/components/ui/toaster'
+import { WhatsAppFloatButton } from '@/components/whatsapp-float-button'
 
 import './globals.css'
 
@@ -27,6 +28,7 @@ export default function RootLayout({
           <GarageProvider>
             <ClientAuthProvider>
               {children}
+              <WhatsAppFloatButton />
               <Toaster />
             </ClientAuthProvider>
           </GarageProvider>
