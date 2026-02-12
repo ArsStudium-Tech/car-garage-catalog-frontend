@@ -233,6 +233,9 @@ export function CatalogFilters({
                 Limpar Filtros
               </Button>
             )}
+            <DrawerClose asChild>
+              <Button className="w-full">Aplicar Filtros</Button>
+            </DrawerClose>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>

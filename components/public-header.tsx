@@ -2,26 +2,12 @@
 
 import Link from "next/link"
 import { Car } from "lucide-react"
-import { useState, useEffect } from "react"
 import Image from "next/image"
-import { getGarage, Garage, getLogoUrl } from "@/lib/api"
+import { getLogoUrl } from "@/lib/api"
+import { useGarage } from "@/components/garage-provider"
 
 export function PublicHeader() {
-  const [garage, setGarage] = useState<Garage | null>(null)
-
-  useEffect(() => {
-    getGarage()
-      .then(setGarage)
-      .catch(() => {
-        // Fallback se não conseguir buscar a garagem
-        setGarage({
-          id: "",
-          name: "AutoCore",
-          domain: "",
-          active: true,
-        })
-      })
-  }, [])
+  const { garage } = useGarage()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
@@ -47,14 +33,14 @@ export function PublicHeader() {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-6">
+        {/* <nav className="flex items-center gap-6">
           <Link
             href="/"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Catálogo
           </Link>
-        </nav>
+        </nav> */}
       </div>
     </header>
   )

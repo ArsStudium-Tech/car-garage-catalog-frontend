@@ -2,16 +2,18 @@
 
 import { useState, useMemo, useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { listCars, formatPrice, listBrandsWithCars, listYearsWithCars, type Brand } from "@/lib/api"
+import { listCars, listBrandsWithCars, listYearsWithCars, type Brand } from "@/lib/api"
 import { CarCard } from "@/components/car-card"
 import { CarCardSkeleton } from "@/components/catalog/car-card-skeleton"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 import { PublicHeader } from "@/components/public-header"
 import { Button } from "@/components/ui/button"
 import { useDebounce } from "@/hooks/use-debounce"
 import { CatalogFilters } from "@/components/catalog/catalog-filters"
+import { useGarage } from "@/components/garage-provider"
 
 export default function CatalogPage() {
+  const { garage, isLoading: isLoadingGarage } = useGarage()
   const [page, setPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedBrand, setSelectedBrand] = useState<string>("all")
@@ -27,11 +29,13 @@ export default function CatalogPage() {
   const { data: brandsData = [] } = useQuery<Brand[]>({
     queryKey: ["brands-with-cars"],
     queryFn: () => listBrandsWithCars(),
+    enabled: !!garage, // Só carrega após a garagem estar carregada
   })
 
   const { data: yearsData = [] } = useQuery<number[]>({
     queryKey: ["years-with-cars"],
     queryFn: () => listYearsWithCars(),
+    enabled: !!garage, // Só carrega após a garagem estar carregada
   })
 
   const queryParams = useMemo(() => {
@@ -61,6 +65,7 @@ export default function CatalogPage() {
   } = useQuery({
     queryKey: ["cars", queryParams],
     queryFn: () => listCars(queryParams),
+    enabled: !!garage, // Só carrega após a garagem estar carregada
   })
 
   const handleFilterChange = () => {
@@ -100,6 +105,17 @@ export default function CatalogPage() {
   const cars = carsData?.cars || []
   const totalPages = carsData?.totalPages || 0
   const total = carsData?.total || 0
+
+  if (isLoadingGarage) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">

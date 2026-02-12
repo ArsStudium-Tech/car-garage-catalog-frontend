@@ -2,7 +2,7 @@ import React from "react"
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { ClientAuthProvider } from '@/components/auth-provider'
-import { PublicHeader } from '@/components/public-header'
+import { GarageProvider } from '@/components/garage-provider'
 import { QueryProvider } from '@/components/query-provider'
 import { Toaster } from '@/components/ui/toaster'
 
@@ -24,10 +24,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} font-sans antialiased`}>
         <QueryProvider>
-          <ClientAuthProvider>
-            {children}
-            <Toaster />
-          </ClientAuthProvider>
+          <GarageProvider>
+            <ClientAuthProvider>
+              {children}
+              <Toaster />
+            </ClientAuthProvider>
+          </GarageProvider>
         </QueryProvider>
       </body>
     </html>
