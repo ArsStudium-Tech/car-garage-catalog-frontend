@@ -50,7 +50,7 @@ export function CarGallery({ images, carName }: CarGalleryProps) {
           <>
             <button
               onClick={prevImage}
-              className="absolute left-0 top-5 bottom-0 w-16 text-card hover:bg-foreground/30 transition-all flex items-center justify-center"
+              className="absolute left-0 top-5 bottom-0 w-16 text-card transition-all flex items-center justify-center"
               type="button"
               aria-label="Imagem anterior"
             >
@@ -58,7 +58,7 @@ export function CarGallery({ images, carName }: CarGalleryProps) {
             </button>
             <button
               onClick={nextImage}
-              className="absolute right-0 top-5 bottom-0 w-16 text-card hover:bg-foreground/30 transition-all flex items-center justify-center"
+              className="absolute right-0 top-5 bottom-0 w-16 text-card transition-all flex items-center justify-center"
               type="button"
               aria-label="Próxima imagem"
             >

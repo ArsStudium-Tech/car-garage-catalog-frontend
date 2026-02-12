@@ -29,12 +29,12 @@ export default function AddVehiclePage() {
           className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 text-sm font-medium"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Inventory
+          Voltar para o inventário
         </Link>
       </div>
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground">Add New Vehicle</h2>
-        <p className="text-muted-foreground mt-1">Enter the vehicle details below.</p>
+        <h2 className="text-2xl font-bold text-foreground">Adicionar Novo Veículo</h2>
+        <p className="text-muted-foreground mt-1">Preencha os detalhes do veículo abaixo.</p>
       </div>
 
       <Form {...form}>
