@@ -160,7 +160,7 @@ export function CatalogFilters({
       </div>
 
       <Drawer open={filtersOpen} onOpenChange={setFiltersOpen}>
-        <DrawerContent className="max-h-[90vh]">
+        <DrawerContent className="max-h-[90vh] p-5">
           <DrawerHeader>
             <DrawerTitle>Filtros</DrawerTitle>
             <DrawerDescription>

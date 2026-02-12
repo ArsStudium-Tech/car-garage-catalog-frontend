@@ -14,6 +14,15 @@ export default function SettingsPage() {
     primaryColor: "#3B82F6",
     secondaryColor: "#1E40AF",
     whatsapp: "",
+    endereco: {
+      logradouro: "",
+      bairro: "",
+      numero: "",
+      cidade: "",
+      estado: "",
+      latitude: "",
+      longitude: "",
+    },
   })
   const [logo, setLogo] = useState<File | null>(null)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
@@ -32,6 +41,15 @@ export default function SettingsPage() {
         primaryColor: settings.primaryColor || "#3B82F6",
         secondaryColor: settings.secondaryColor || "#1E40AF",
         whatsapp: settings.whatsapp || "",
+        endereco: {
+          logradouro: settings.endereco?.logradouro || "",
+          bairro: settings.endereco?.bairro || "",
+          numero: settings.endereco?.numero || "",
+          cidade: settings.endereco?.cidade || "",
+          estado: settings.endereco?.estado || "",
+          latitude: settings.endereco?.latitude?.toString() || "",
+          longitude: settings.endereco?.longitude?.toString() || "",
+        },
       })
       setCurrentLogoUrl(settings.logoUrl || null)
     } catch (err: any) {
@@ -48,12 +66,29 @@ export default function SettingsPage() {
     setLoading(true)
 
     try {
+      // Prepara o objeto de endereço apenas com campos preenchidos
+      const enderecoData: any = {}
+      if (formData.endereco.logradouro?.trim()) enderecoData.logradouro = formData.endereco.logradouro.trim()
+      if (formData.endereco.bairro?.trim()) enderecoData.bairro = formData.endereco.bairro.trim()
+      if (formData.endereco.numero?.trim()) enderecoData.numero = formData.endereco.numero.trim()
+      if (formData.endereco.cidade?.trim()) enderecoData.cidade = formData.endereco.cidade.trim()
+      if (formData.endereco.estado?.trim()) enderecoData.estado = formData.endereco.estado.trim()
+      if (formData.endereco.latitude?.trim()) {
+        const lat = parseFloat(formData.endereco.latitude)
+        if (!isNaN(lat)) enderecoData.latitude = lat
+      }
+      if (formData.endereco.longitude?.trim()) {
+        const lng = parseFloat(formData.endereco.longitude)
+        if (!isNaN(lng)) enderecoData.longitude = lng
+      }
+
       await updateSettings({
         name: formData.name,
         primaryColor: formData.primaryColor,
         secondaryColor: formData.secondaryColor,
         whatsapp: formData.whatsapp,
         logo: logo || undefined,
+        endereco: Object.keys(enderecoData).length > 0 ? enderecoData : undefined,
       })
 
       setSuccess("Configurações atualizadas com sucesso!")
@@ -304,6 +339,118 @@ export default function SettingsPage() {
               disabled={loading}
             />
             <p className="text-xs text-muted-foreground">Número completo com código do país (ex: +5511999999999)</p>
+          </div>
+        </div>
+
+        {/* Endereço */}
+        <div className="bg-card p-6 rounded-xl shadow-sm border border-border">
+          <h3 className="text-lg font-semibold mb-6 text-foreground">Endereço</h3>
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-foreground">Logradouro</label>
+                <input
+                  className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg focus:ring-primary focus:border-primary text-foreground text-sm"
+                  value={formData.endereco.logradouro}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    endereco: { ...formData.endereco, logradouro: e.target.value }
+                  })}
+                  placeholder="Ex: Rua das Flores"
+                  disabled={loading}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-foreground">Número</label>
+                <input
+                  className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg focus:ring-primary focus:border-primary text-foreground text-sm"
+                  value={formData.endereco.numero}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    endereco: { ...formData.endereco, numero: e.target.value }
+                  })}
+                  placeholder="Ex: 123"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-foreground">Bairro</label>
+                <input
+                  className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg focus:ring-primary focus:border-primary text-foreground text-sm"
+                  value={formData.endereco.bairro}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    endereco: { ...formData.endereco, bairro: e.target.value }
+                  })}
+                  placeholder="Ex: Centro"
+                  disabled={loading}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-foreground">Cidade</label>
+                <input
+                  className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg focus:ring-primary focus:border-primary text-foreground text-sm"
+                  value={formData.endereco.cidade}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    endereco: { ...formData.endereco, cidade: e.target.value }
+                  })}
+                  placeholder="Ex: São Paulo"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-foreground">Estado</label>
+                <input
+                  className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg focus:ring-primary focus:border-primary text-foreground text-sm"
+                  value={formData.endereco.estado}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    endereco: { ...formData.endereco, estado: e.target.value }
+                  })}
+                  placeholder="Ex: SP"
+                  maxLength={2}
+                  disabled={loading}
+                />
+                <p className="text-xs text-muted-foreground">Sigla do estado (ex: SP, RJ, MG)</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-foreground">Latitude</label>
+                <input
+                  type="number"
+                  step="any"
+                  className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg focus:ring-primary focus:border-primary text-foreground text-sm"
+                  value={formData.endereco.latitude}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    endereco: { ...formData.endereco, latitude: e.target.value }
+                  })}
+                  placeholder="Ex: -23.5505"
+                  disabled={loading}
+                />
+                <p className="text-xs text-muted-foreground">Coordenada de latitude</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-foreground">Longitude</label>
+                <input
+                  type="number"
+                  step="any"
+                  className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg focus:ring-primary focus:border-primary text-foreground text-sm"
+                  value={formData.endereco.longitude}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    endereco: { ...formData.endereco, longitude: e.target.value }
+                  })}
+                  placeholder="Ex: -46.6333"
+                  disabled={loading}
+                />
+                <p className="text-xs text-muted-foreground">Coordenada de longitude</p>
+              </div>
+            </div>
           </div>
         </div>
 

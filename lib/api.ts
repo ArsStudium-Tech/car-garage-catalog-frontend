@@ -36,6 +36,15 @@ export interface Garage {
   secondaryColor?: string | null;
   whatsapp?: string | null;
   active: boolean;
+  endereco?: {
+    logradouro?: string | null;
+    bairro?: string | null;
+    numero?: string | null;
+    cidade?: string | null;
+    estado?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+  } | null;
 }
 
 async function fetchAPI(endpoint: string) {
