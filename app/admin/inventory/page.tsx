@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Search, Plus, Eye, Pencil, Trash2, ChevronLeft, ChevronRight, TrendingUp, DollarSign, Calendar, ShoppingBag } from "lucide-react"
-import { listCarsAdmin, deleteCarAdmin, formatPrice, formatMileage, getCarImageUrl, AdminCar, listBrands } from "@/lib/api-admin"
+import { listCarsAdmin, deleteCarAdmin, formatPrice, formatMileage, getCarImageUrl, AdminCar, listBrands, Brand } from "@/lib/api-admin"
 import Image from "next/image"
 import { Car as CarIcon } from "lucide-react"
 import {
@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
+import { listBrandsWithCars } from "@/lib/api"
 
 export default function InventoryPage() {
   const router = useRouter()
@@ -39,13 +40,11 @@ export default function InventoryPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [carToDelete, setCarToDelete] = useState<string | null>(null)
 
-  // Buscar marcas para o filtro
-  const { data: brands = [] } = useQuery({
-    queryKey: ["brands"],
-    queryFn: listBrands,
+  const { data: brands = [] } = useQuery<Brand[]>({
+    queryKey: ["brands-with-cars"],
+    queryFn: () => listBrandsWithCars(),
   })
 
-  // Preparar parâmetros da query
   const queryParams = useMemo(() => {
     const params: any = {
       page,
