@@ -1,6 +1,5 @@
 "use client"
 
-import { useMemo } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Save } from "lucide-react"
@@ -30,27 +29,24 @@ export default function EditVehiclePage() {
     queryFn: () => listBrands(),
   })
 
-  const defaultValues = useMemo<Partial<CarFormData> | undefined>(() => {
-    if (!car) return undefined
-    return {
-      brandId: String(car.brandId || ""),
-      model: car.model,
-      year: car.year,
-      price: car.price,
-      mileage: car.mileage ?? null,
-      description: car.description ?? "",
-      status: car.status,
-      fuel: car.fuel ?? null,
-      color: car.color ?? null,
-      transmission: car.transmission ?? null,
-      licensePlate: car.licensePlate ?? null,
-      financeable: car.financeable ?? false,
-      options: (car.options as Record<string, boolean>) ?? {},
-      existingImages: car.images || [],
-      imagesToKeep: car.images || [],
-      images: [],
-    }
-  }, [car])
+  const defaultValues: Partial<CarFormData> | undefined = car ? {
+    brandId: car.brandId ? String(car.brandId) : "",
+    model: car.model || "",
+    year: car.year,
+    price: car.price,
+    mileage: car.mileage ?? null,
+    description: car.description ?? "",
+    status: car.status,
+    fuel: car.fuel ?? null,
+    color: car.color ?? null,
+    transmission: car.transmission ?? null,
+    licensePlate: car.licensePlate ?? null,
+    financeable: car.financeable ?? false,
+    options: (car.options as Record<string, boolean>) ?? {},
+    existingImages: car.images || [],
+    imagesToKeep: car.images || [],
+    images: [],
+  } : undefined
 
   const { form, onSubmit, isSubmitting } = useCarForm({
     carId,
@@ -100,7 +96,7 @@ export default function EditVehiclePage() {
         <p className="text-muted-foreground mt-1">Atualize os detalhes do veículo abaixo.</p>
       </div>
 
-      <Form {...form}>
+      <Form {...form} key={`form-${car.id}-${car.brandId}-${car.fuel}-${car.transmission}`}>
         <form onSubmit={onSubmit} className="space-y-6">
           <BasicInfoSection brands={brands} isEdit={true} />
           <DescriptionSection />

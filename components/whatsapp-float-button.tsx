@@ -1,9 +1,16 @@
 "use client"
 
+import { usePathname } from "next/navigation"
 import { useGarage } from "@/components/garage-provider"
 
 export function WhatsAppFloatButton() {
+  const pathname = usePathname()
   const { garage, isLoading } = useGarage()
+
+  // Não mostra o botão em páginas admin
+  if (pathname?.includes("/admin")) {
+    return null
+  }
 
   if (isLoading || !garage?.whatsapp) {
     return null

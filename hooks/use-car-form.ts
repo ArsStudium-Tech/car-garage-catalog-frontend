@@ -20,7 +20,6 @@ export function useCarForm({ carId, defaultValues, onSuccess }: UseCarFormOption
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const isEdit = !!carId
-  const hasInitialized = useRef(false)
 
   const form = useForm<CarFormData>({
     resolver: zodResolver(carFormSchema),
@@ -41,22 +40,20 @@ export function useCarForm({ carId, defaultValues, onSuccess }: UseCarFormOption
       images: [],
       existingImages: [],
       imagesToKeep: [],
-      ...defaultValues,
     },
   })
 
-  // Reset form when defaultValues change (for edit mode) - only once
+  // Reset form when defaultValues change (for edit mode)
   useEffect(() => {
-    if (defaultValues && Object.keys(defaultValues).length > 0 && !hasInitialized.current) {
-      hasInitialized.current = true
-      form.reset({
+    if (defaultValues && Object.keys(defaultValues).length > 0 && isEdit) {
+      const resetValues: CarFormData = {
         brandId: defaultValues.brandId ? String(defaultValues.brandId) : "",
         model: defaultValues.model || "",
         year: defaultValues.year || new Date().getFullYear(),
         price: defaultValues.price || 0,
         mileage: defaultValues.mileage ?? null,
         description: defaultValues.description ?? "",
-        status: defaultValues.status || "AVAILABLE",
+        status: (defaultValues.status as "AVAILABLE" | "SOLD") || "AVAILABLE",
         fuel: defaultValues.fuel ?? null,
         color: defaultValues.color ?? null,
         transmission: defaultValues.transmission ?? null,
@@ -66,16 +63,36 @@ export function useCarForm({ carId, defaultValues, onSuccess }: UseCarFormOption
         images: defaultValues.images || [],
         existingImages: defaultValues.existingImages || [],
         imagesToKeep: defaultValues.imagesToKeep || [],
-      })
+      }
+      // Use setTimeout to ensure reset happens after render
+      const timer = setTimeout(() => {
+        form.reset(resetValues, { keepDefaultValues: false })
+      }, 0)
+      return () => clearTimeout(timer)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultValues])
+  }, [
+    defaultValues?.brandId,
+    defaultValues?.fuel,
+    defaultValues?.transmission,
+    defaultValues?.model,
+    defaultValues?.year,
+    defaultValues?.price,
+    isEdit
+  ])
 
   const createMutation = useMutation({
     mutationFn: async (data: CarFormData) => {
       const { images, existingImages, imagesToKeep, ...carData } = data
       return createCarAdmin({
         ...carData,
+        mileage: carData.mileage ?? undefined,
+        description: carData.description ?? undefined,
+        fuel: carData.fuel ?? undefined,
+        color: carData.color ?? undefined,
+        transmission: carData.transmission ?? undefined,
+        licensePlate: carData.licensePlate ?? undefined,
+        options: carData.options ?? undefined,
         images: images || undefined,
       })
     },
@@ -106,6 +123,13 @@ export function useCarForm({ carId, defaultValues, onSuccess }: UseCarFormOption
       const { images, existingImages, imagesToKeep, ...carData } = data
       return updateCarAdmin(carId, {
         ...carData,
+        mileage: carData.mileage ?? undefined,
+        description: carData.description ?? undefined,
+        fuel: carData.fuel ?? undefined,
+        color: carData.color ?? undefined,
+        transmission: carData.transmission ?? undefined,
+        licensePlate: carData.licensePlate ?? undefined,
+        options: carData.options ?? undefined,
         images: images || undefined,
         imagesToKeep: imagesToKeep || existingImages,
       })

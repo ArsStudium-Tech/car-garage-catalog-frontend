@@ -52,7 +52,7 @@ export function BasicInfoSection({ brands, isEdit = false }: BasicInfoSectionPro
               <FormLabel>Marca *</FormLabel>
               <Select 
                 onValueChange={field.onChange} 
-                value={field.value ? String(field.value) : ""} 
+                value={field.value ? String(field.value) : ""}
                 disabled={isSubmitting}
               >
                 <FormControl>
@@ -191,7 +191,7 @@ export function BasicInfoSection({ brands, isEdit = false }: BasicInfoSectionPro
               <FormLabel>Combustível</FormLabel>
               <Select 
                 onValueChange={(value) => field.onChange(value === "none" ? null : value)} 
-                value={field.value ?? "none"} 
+                value={field.value || "none"}
                 disabled={isSubmitting}
               >
                 <FormControl>
@@ -237,7 +237,7 @@ export function BasicInfoSection({ brands, isEdit = false }: BasicInfoSectionPro
               <FormLabel>Câmbio</FormLabel>
               <Select 
                 onValueChange={(value) => field.onChange(value === "none" ? null : value)} 
-                value={field.value ?? "none"} 
+                value={field.value || "none"}
                 disabled={isSubmitting}
               >
                 <FormControl>
